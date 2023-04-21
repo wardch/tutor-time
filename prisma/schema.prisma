@@ -12,7 +12,6 @@ model Tutor {
     id             Int                 @id @default(autoincrement())
     name           String
     email          String              @unique
-    password       String
     lessons        Lesson[]
     availabilities TutorAvailability[]
 }
@@ -21,7 +20,6 @@ model Student {
     id           Int                  @id @default(autoincrement())
     name         String
     email        String               @unique
-    password     String
     lessons      Lesson[]
     availability StudentAvailability?
 }
@@ -29,16 +27,18 @@ model Student {
 model TutorAvailability {
     id        Int      @id @default(autoincrement())
     tutorId   Int
-    startTime DateTime
-    endTime   DateTime
+    startTime String
+    endTime   String
     tutor     Tutor    @relation(fields: [tutorId], references: [id])
+
+    @@index([tutorId])
 }
 
 model StudentAvailability {
     id        Int      @id @default(autoincrement())
     studentId Int      @unique
-    startTime DateTime
-    endTime   DateTime
+    startTime String
+    endTime   String
     student   Student  @relation(fields: [studentId], references: [id])
 }
 
@@ -46,11 +46,12 @@ model Lesson {
     id        Int      @id @default(autoincrement())
     tutorId   Int
     studentId Int
-    startTime DateTime
-    endTime   DateTime
+    startTime String
+    endTime   String
     status    String
     tutor     Tutor    @relation(fields: [tutorId], references: [id])
     student   Student  @relation(fields: [studentId], references: [id])
+
     @@index([studentId])
     @@index([tutorId])
 }
