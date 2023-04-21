@@ -51,6 +51,8 @@ model Lesson {
     status    String
     tutor     Tutor    @relation(fields: [tutorId], references: [id])
     student   Student  @relation(fields: [studentId], references: [id])
+    @@index([studentId])
+    @@index([tutorId])
 }
 
 // ignore: From the twitter-clone example
