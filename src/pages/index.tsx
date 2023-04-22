@@ -4,7 +4,11 @@ import Head from "next/head";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
-import { schema, type TutorForm } from "~/utils/zodHelpers";
+import {
+  type DeleteTutorAvailabilityProps,
+  tutorAvailabilitySchema,
+  type TutorForm,
+} from "~/utils/zodHelpers";
 
 const Home: NextPage = () => {
   const user = useUser();
@@ -42,13 +46,15 @@ const Home: NextPage = () => {
 
 const TutorAvailabilityForm = () => {
   const { register, handleSubmit } = useForm<TutorForm>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(tutorAvailabilitySchema),
   });
+
+  const ctx = api.useContext();
 
   const { mutate } = api.tutoralAvailability.create.useMutation({
     onSuccess: () => {
       console.log("SUCCESS POSTING");
-      // void ctx.tutorAvailability.getAll.invalidate();
+      void ctx.tutoralAvailability.getAll.invalidate();
     },
     onError: (e) => {
       console.log("ERROR", e);
@@ -58,6 +64,23 @@ const TutorAvailabilityForm = () => {
   const submit = (data: TutorForm) => {
     console.log("data in submit", data);
     mutate(data);
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const time = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")}`;
+        options.push(
+          <option key={time} value={time}>
+            {time}
+          </option>
+        );
+      }
+    }
+    return options;
   };
 
   /* eslint-disable */
@@ -73,8 +96,22 @@ const TutorAvailabilityForm = () => {
             placeholder="Tutor Email"
             {...register("email")}
           />
-          <input type="time" {...register("startTime")} />
-          <input type="time" {...register("endTime")} />
+          <label className="text-slate-400" htmlFor="startTime">
+            Choose Start Time:
+          </label>
+          <select
+            id="startTime"
+            defaultValue="08:00"
+            {...register("startTime")}
+          >
+            {generateTimeOptions()}
+          </select>
+          <label htmlFor="endTime" className="text-slate-400">
+            Choose End Time:
+          </label>
+          <select id="endTime" defaultValue="10:00" {...register("endTime")}>
+            {generateTimeOptions()}
+          </select>
           <input type="submit" value="Add Availability" />
         </form>
       </div>
@@ -83,8 +120,25 @@ const TutorAvailabilityForm = () => {
 };
 
 const TutorAvailabilityTable = () => {
-  const { data } = api.tutoralAvailability.getAll.useQuery();
-  console.log("All tutor availability :>> ", data);
+  const { data: tutorAvailabilities } =
+    api.tutoralAvailability.getAll.useQuery();
+
+  const ctx = api.useContext();
+
+  const { mutate } = api.tutoralAvailability.delete.useMutation({
+    onSuccess: () => {
+      console.log("Delete availability");
+      void ctx.tutoralAvailability.getAll.invalidate();
+    },
+    onError: (e) => {
+      console.log("ERROR", e);
+    },
+  });
+  
+  const handleAvailabilityDelete = (props: DeleteTutorAvailabilityProps) => {
+    const { tutorId, startTime, endTime } = props;
+    mutate(props)
+  };
 
   return (
     <div className="relative overflow-x-auto p-4">
@@ -104,25 +158,39 @@ const TutorAvailabilityTable = () => {
               End Time
             </th>
             <th scope="col" className="px-6 py-3">
-              Delete
+              Delete Availability
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr className="border-b bg-slate-100">
-            <th
-              scope="row"
-              className="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
-            >
-              Apple MacBook Pro 17"
-            </th>
-            <td className="px-6 py-4">Silver</td>
-            <td className="px-6 py-4">Laptop</td>
-            <td className="px-6 py-4">$2999</td>
-            <td className="px-6 py-4">
-              <button>Delete Availability</button>
-            </td>
-          </tr>
+          {tutorAvailabilities?.map((tutor) =>
+            tutor.availabilities.map((availability) => (
+              <tr key={availability.id} className="border-b bg-slate-100">
+                <th
+                  scope="row"
+                  className="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
+                >
+                  {tutor.name}
+                </th>
+                <td className="px-6 py-4">{tutor.email}</td>
+                <td className="px-6 py-4">{availability.startTime}</td>
+                <td className="px-6 py-4">{availability.endTime}</td>
+                <td className="px-6 py-4">
+                  <button
+                    onClick={() => {
+                      handleAvailabilityDelete({
+                        tutorId: tutor.id,
+                        startTime: availability.startTime,
+                        endTime: availability.endTime,
+                      });
+                    }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
