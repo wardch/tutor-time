@@ -62,17 +62,23 @@ const students = await getStudentsAndAvailabilities(ctx);
               availability.startTime,
               availability.endTime
             )
-        )
+        ) 
       );
 
       if (matchedTutors.length > 0) {
         matchedTutors.sort((a, b) => {
-            return tutorLessonCount[a.id] - tutorLessonCount[b.id]
+            return (tutorLessonCount[a.id] ?? 0) - (tutorLessonCount[b.id] ?? 0)
         });
 
         const selectedTutor = matchedTutors[0];
+        if(!selectedTutor) {
+            console.log(`NO TUTOR FOUND FOR STUDENT: ${student.name} EMAIL: ${student.email}`)
+            return;
+        }
         tutorLessonCount[selectedTutor.id] += 1;
 
+        console.log('SELECTED TUT', selectedTutor.availabilities)
+      
         proposedLessons.push({
             studentName: student.name,
             studentEmail: student.email,
@@ -105,7 +111,6 @@ const students = await getStudentsAndAvailabilities(ctx);
 export const lessonRouter = createTRPCRouter({ 
   getProposedLessons: privateProcedure.query(async ({ ctx }) => {
     const result = await getStudentsWithMatchingTutors(ctx);
-    console.log('result :>> ', result);
     return result;
   })
 });

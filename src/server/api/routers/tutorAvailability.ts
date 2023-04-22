@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 import { deleteTutorAvailabilitySchema, availabilitySchema } from "~/utils/zodHelpers";
 
+
 export const tutorAvailabilityRouter = createTRPCRouter({ 
   getAll: publicProcedure.query(({ ctx }) => {
      const tutors = ctx.prisma.tutor.findMany({
