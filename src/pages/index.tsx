@@ -1,14 +1,10 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { api } from "~/utils/api";
-import {
-  type DeleteTutorAvailabilityProps,
-  tutorAvailabilitySchema,
-  type TutorForm,
-} from "~/utils/zodHelpers";
+import { StudentAvailabilityForm } from "~/components/studentAvailability/StudentAvailabilityForm";
+import { StudentAvailabilityTable } from "~/components/studentAvailability/StudentAvailabilityTable";
+import { TutorAvailabilityForm } from "~/components/tutorAvailability/TutorAvailabilityForm";
+import { TutorAvailabilityTable } from "~/components/tutorAvailability/TutorAvailabilityTable";
 
 const Home: NextPage = () => {
   const user = useUser();
@@ -39,161 +35,10 @@ const Home: NextPage = () => {
         </nav>
         <TutorAvailabilityForm />
         <TutorAvailabilityTable />
+        <StudentAvailabilityForm />
+        <StudentAvailabilityTable />
       </main>
     </>
-  );
-};
-
-const TutorAvailabilityForm = () => {
-  const { register, handleSubmit } = useForm<TutorForm>({
-    resolver: zodResolver(tutorAvailabilitySchema),
-  });
-
-  const ctx = api.useContext();
-
-  const { mutate } = api.tutoralAvailability.create.useMutation({
-    onSuccess: () => {
-      console.log("SUCCESS POSTING");
-      void ctx.tutoralAvailability.getAll.invalidate();
-    },
-    onError: (e) => {
-      console.log("ERROR", e);
-    },
-  });
-
-  const submit = (data: TutorForm) => {
-    console.log("data in submit", data);
-    mutate(data);
-  };
-
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        options.push(
-          <option key={time} value={time}>
-            {time}
-          </option>
-        );
-      }
-    }
-    return options;
-  };
-
-  /* eslint-disable */
-
-  return (
-    <div className="flex w-full justify-center py-4">
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl">Tutors Availability</h1>
-        <form onSubmit={handleSubmit(submit)} className="p-4">
-          <input type="text" placeholder="Tutor's name" {...register("name")} />
-          <input
-            type="email"
-            placeholder="Tutor Email"
-            {...register("email")}
-          />
-          <label className="text-slate-400" htmlFor="startTime">
-            Choose Start Time:
-          </label>
-          <select
-            id="startTime"
-            defaultValue="08:00"
-            {...register("startTime")}
-          >
-            {generateTimeOptions()}
-          </select>
-          <label htmlFor="endTime" className="text-slate-400">
-            Choose End Time:
-          </label>
-          <select id="endTime" defaultValue="10:00" {...register("endTime")}>
-            {generateTimeOptions()}
-          </select>
-          <input type="submit" value="Add Availability" />
-        </form>
-      </div>
-    </div>
-  );
-};
-
-const TutorAvailabilityTable = () => {
-  const { data: tutorAvailabilities } =
-    api.tutoralAvailability.getAll.useQuery();
-
-  const ctx = api.useContext();
-
-  const { mutate } = api.tutoralAvailability.delete.useMutation({
-    onSuccess: () => {
-      console.log("Delete availability");
-      void ctx.tutoralAvailability.getAll.invalidate();
-    },
-    onError: (e) => {
-      console.log("ERROR", e);
-    },
-  });
-  
-  const handleAvailabilityDelete = (props: DeleteTutorAvailabilityProps) => {
-    const { tutorId, startTime, endTime } = props;
-    mutate(props)
-  };
-
-  return (
-    <div className="relative overflow-x-auto p-4">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-slate-500 text-xs uppercase">
-          <tr>
-            <th scope="col" className="px-6 py-3">
-              Name
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Email
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Start Time
-            </th>
-            <th scope="col" className="px-6 py-3">
-              End Time
-            </th>
-            <th scope="col" className="px-6 py-3">
-              Delete Availability
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tutorAvailabilities?.map((tutor) =>
-            tutor.availabilities.map((availability) => (
-              <tr key={availability.id} className="border-b bg-slate-100">
-                <th
-                  scope="row"
-                  className="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
-                >
-                  {tutor.name}
-                </th>
-                <td className="px-6 py-4">{tutor.email}</td>
-                <td className="px-6 py-4">{availability.startTime}</td>
-                <td className="px-6 py-4">{availability.endTime}</td>
-                <td className="px-6 py-4">
-                  <button
-                    onClick={() => {
-                      handleAvailabilityDelete({
-                        tutorId: tutor.id,
-                        startTime: availability.startTime,
-                        endTime: availability.endTime,
-                      });
-                    }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
   );
 };
 

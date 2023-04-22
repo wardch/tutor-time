@@ -1,9 +1,9 @@
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
-import { deleteTutorAvailabilitySchema, availabilitySchema } from "~/utils/zodHelpers";
+import { availabilitySchema, deleteStudentAvailabilitySchema } from "~/utils/zodHelpers";
 
-export const tutorAvailabilityRouter = createTRPCRouter({ 
+export const studentAvalabiltyRouter = createTRPCRouter({ 
   getAll: publicProcedure.query(({ ctx }) => {
-     const tutors = ctx.prisma.tutor.findMany({
+     const students = ctx.prisma.student.findMany({
         select: {
           id: true,
           name: true,
@@ -18,12 +18,12 @@ export const tutorAvailabilityRouter = createTRPCRouter({
         },
       });
 
-  return tutors;
+  return students;
   }),
   create: privateProcedure.input(
     availabilitySchema
   ).mutation(async ({ ctx, input }) => {
-    const tutor = await ctx.prisma.tutor.upsert({
+    const student = await ctx.prisma.student.upsert({
       where: {
         email: input.email
       },
@@ -34,9 +34,9 @@ export const tutorAvailabilityRouter = createTRPCRouter({
       }
     });
     
-    const existingAvailability = await ctx.prisma.tutorAvailability.findFirst({
+    const existingAvailability = await ctx.prisma.studentAvailability.findFirst({
     where: {
-      tutorId: tutor.id,
+      studentId: student.id,
       startTime: {
         lte: input.endTime,
       },
@@ -46,11 +46,10 @@ export const tutorAvailabilityRouter = createTRPCRouter({
     },
   });
 
-  let tutorAvailability;
-  console.log('existingAvailability :>> ', existingAvailability);
+  let studentAvailability;
 
   if (existingAvailability) {
-    tutorAvailability = await ctx.prisma.tutorAvailability.update({
+    studentAvailability = await ctx.prisma.studentAvailability.update({
       where: {
         id: existingAvailability.id,
       },
@@ -60,23 +59,23 @@ export const tutorAvailabilityRouter = createTRPCRouter({
       },
     });
   } else {
-    tutorAvailability = await ctx.prisma.tutorAvailability.create({
+    studentAvailability = await ctx.prisma.studentAvailability.create({
       data: {
-        tutorId: tutor.id,
+        studentId: student.id,
         startTime: input.startTime,
         endTime: input.endTime,
       },
     });
   }
 
-    return tutorAvailability
+    return studentAvailability
   }),
   delete: privateProcedure
-  .input(deleteTutorAvailabilitySchema  )
+  .input(deleteStudentAvailabilitySchema )
   .mutation(async ({ ctx, input }) => {
-    const deletedAvailability = await ctx.prisma.tutorAvailability.deleteMany({
+    const deletedAvailability = await ctx.prisma.studentAvailability.deleteMany({
       where: {
-        tutorId: input.tutorId,
+        studentId: input.studentId,
         startTime: input.startTime,
         endTime: input.endTime,
       },
