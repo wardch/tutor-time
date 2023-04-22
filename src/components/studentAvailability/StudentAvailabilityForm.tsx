@@ -72,16 +72,11 @@ export const StudentAvailabilityForm = () => {
 
   /* eslint-disable */
 
-  const onFormSubmit = (event) => {
-    console.log("Form submitted", event);
-    handleSubmit(submit)(event);
-  };
-
   return (
     <div className="flex w-full justify-center py-4">
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-2xl">Students Availability</h1>
-        <form onSubmit={onFormSubmit} className="p-4">
+        <form onSubmit={handleSubmit(submit)} className="p-4">
           <input
             type="text"
             placeholder="Student's name"
