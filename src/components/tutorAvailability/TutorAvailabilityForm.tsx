@@ -21,7 +21,6 @@ export const TutorAvailabilityForm = () => {
   });
 
   const submit = (data: AvailabilityForm) => {
-    console.log("data in submit", data);
     mutate(data);
   };
 

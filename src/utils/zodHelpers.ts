@@ -9,11 +9,23 @@ export type AvailabilityForm = {
   endTime: string;
 };
 
+export type StudentAvailabilityFormProps = {
+  name: string;
+  email: string;
+  startTime: string;
+};
+
 export const availabilitySchema: ZodType<AvailabilityForm> = z.object({
     name: z.string().min(2).max(300),
     email: z.string().email(),
     startTime: z.string(),
     endTime: z.string(),
+  });
+
+export const studentAvailabilitySchema: ZodType<StudentAvailabilityFormProps> = z.object({
+    name: z.string().min(2).max(300),
+    email: z.string().email(),
+    startTime: z.string()
   });
 
 export type DeleteTutorAvailabilityProps = {

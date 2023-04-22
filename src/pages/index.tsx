@@ -1,10 +1,12 @@
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
+import { useCallback, useState } from "react";
 import { StudentAvailabilityForm } from "~/components/studentAvailability/StudentAvailabilityForm";
 import { StudentAvailabilityTable } from "~/components/studentAvailability/StudentAvailabilityTable";
 import { TutorAvailabilityForm } from "~/components/tutorAvailability/TutorAvailabilityForm";
 import { TutorAvailabilityTable } from "~/components/tutorAvailability/TutorAvailabilityTable";
+import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
   const user = useUser();
@@ -33,6 +35,7 @@ const Home: NextPage = () => {
             )}
           </div>
         </nav>
+        {/* <LessonSchedule /> */}
         <TutorAvailabilityForm />
         <TutorAvailabilityTable />
         <StudentAvailabilityForm />
@@ -41,5 +44,59 @@ const Home: NextPage = () => {
     </>
   );
 };
+
+// const LessonSchedule = () => {
+//   const [proposedLessons, setProposedLessons] = useState([]);
+//   const proposedLessonsQuery = api.lessons.getProposedLessons.useQuery();
+
+//   const onGenerateScheduleClick = useCallback(() => {
+//     const { data } = proposedLessonsQuery;
+//     // setProposedLessons(data);
+//   }, [proposedLessonsQuery]);
+
+//   if (proposedLessons.length === 0) {
+//     return (
+//       <button onClick={() => onGenerateScheduleClick()}>
+//         Click to Propose Schedule
+//       </button>
+//     );
+//   }
+
+//   return (
+//     <div className="flex w-full justify-center py-4">
+//       <div className="flex flex-col items-center justify-center">
+//         <h1 className="text-2xl">Proposed Lessons</h1>
+//         <table className="border-collapse border border-gray-500">
+//           <thead>
+//             <tr>
+//               <th className="border border-gray-400 p-2">Tutor</th>
+//               <th className="border border-gray-400 p-2">Student</th>
+//               <th className="border border-gray-400 p-2">Start Time</th>
+//               <th className="border border-gray-400 p-2">End Time</th>
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {proposedLessons.map((proposedLesson) => (
+//               <tr key={proposedLesson.id}>
+//                 <td className="border border-gray-400 p-2">
+//                   {proposedLesson.tutorId}
+//                 </td>
+//                 <td className="border border-gray-400 p-2">
+//                   {proposedLesson.studentId}
+//                 </td>
+//                 <td className="border border-gray-400 p-2">
+//                   {proposedLesson.startTime}
+//                 </td>
+//                 <td className="border border-gray-400 p-2">
+//                   {proposedLesson.endTime}
+//                 </td>
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default Home;
