@@ -46,7 +46,9 @@ export const TutorAvailabilityForm = () => {
   return (
     <div className="flex w-full justify-center py-4">
       <div className="flex flex-col items-center justify-center gap-5">
-        <p className="text-2xl font-light text-slate-500">Please enter tutor availability below</p>
+        <p className="text-2xl font-light text-slate-500">
+          Please enter tutor availability below
+        </p>
         <form
           onSubmit={handleSubmit(submit)}
           className="flex w-96 flex-col rounded bg-white p-4"

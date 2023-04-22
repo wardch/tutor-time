@@ -21,42 +21,38 @@ export const TutorAvailabilityTable = () => {
   };
 
   return (
-    <div className="relative overflow-x-auto p-4">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-slate-500 text-xs uppercase">
+    <div className="overflow-x-auto rounded-lg shadow-lg">
+      <table className="w-full border-collapse">
+        <thead className="bg-purple-600 text-white">
           <tr>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-4 py-2">
               Name
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-4 py-2">
               Email
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-4 py-2">
               Start Time
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-4 py-2">
               End Time
             </th>
-            <th scope="col" className="px-6 py-3">
+            <th scope="col" className="px-4 py-2">
               Delete Availability
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-200">
           {tutorAvailabilities?.map((tutor) =>
             tutor.availabilities.map((availability) => (
-              <tr key={availability.id} className="border-b bg-slate-100">
-                <th
-                  scope="row"
-                  className="whitespace-nowrap px-6 py-4 font-medium text-gray-900"
-                >
-                  {tutor.name}
-                </th>
-                <td className="px-6 py-4">{tutor.email}</td>
-                <td className="px-6 py-4">{availability.startTime}</td>
-                <td className="px-6 py-4">{availability.endTime}</td>
-                <td className="px-6 py-4">
+              <tr key={availability.id}>
+                <td className="whitespace-nowrap px-4 py-4">{tutor.name}</td>
+                <td className="px-4 py-4">{tutor.email}</td>
+                <td className="px-4 py-4">{availability.startTime}</td>
+                <td className="px-4 py-4">{availability.endTime}</td>
+                <td className="px-4 py-4 text-center">
                   <button
+                    className="rounded-lg bg-slate-500 p-2 font-medium text-white hover:bg-red-700"
                     onClick={() => {
                       handleAvailabilityDelete({
                         tutorId: tutor.id,
