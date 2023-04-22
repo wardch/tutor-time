@@ -17,6 +17,8 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
 import { prisma } from "~/server/db";
+import { type inferAsyncReturnType } from '@trpc/server';
+
 
 /**
  * This is the actual context you will use in your router. It will be used to process every request
@@ -35,6 +37,8 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
     userId,
   };
 };
+
+export type Context = inferAsyncReturnType<typeof createTRPCContext>;
 
 /**
  * 2. INITIALIZATION

@@ -7,6 +7,7 @@ import { StudentAvailabilityTable } from "~/components/studentAvailability/Stude
 import { TutorAvailabilityForm } from "~/components/tutorAvailability/TutorAvailabilityForm";
 import { TutorAvailabilityTable } from "~/components/tutorAvailability/TutorAvailabilityTable";
 import { api } from "~/utils/api";
+import { type MatchingStudentTutor } from "~/server/api/routers/lessons";
 
 const Home: NextPage = () => {
   const user = useUser();
@@ -35,7 +36,7 @@ const Home: NextPage = () => {
             )}
           </div>
         </nav>
-        {/* <LessonSchedule /> */}
+        <LessonSchedule />
         <TutorAvailabilityForm />
         <TutorAvailabilityTable />
         <StudentAvailabilityForm />
@@ -45,58 +46,78 @@ const Home: NextPage = () => {
   );
 };
 
-// const LessonSchedule = () => {
-//   const [proposedLessons, setProposedLessons] = useState([]);
-//   const proposedLessonsQuery = api.lessons.getProposedLessons.useQuery();
+const LessonSchedule = () => {
+  const [proposedLessons, setProposedLessons] = useState<
+    MatchingStudentTutor[]
+  >([]);
+  const proposedLessonsQuery = api.lessons.getProposedLessons.useQuery();
 
-//   const onGenerateScheduleClick = useCallback(() => {
-//     const { data } = proposedLessonsQuery;
-//     // setProposedLessons(data);
-//   }, [proposedLessonsQuery]);
+  const onGenerateScheduleClick = useCallback(() => {
+    const { data } = proposedLessonsQuery;
+    if (!data) {
+      console.log("No data returning");
+      return;
+    }
+    console.log("data for the SCHEDULE:>> ", data);
+    setProposedLessons(data);
+  }, [proposedLessonsQuery]);
 
-//   if (proposedLessons.length === 0) {
-//     return (
-//       <button onClick={() => onGenerateScheduleClick()}>
-//         Click to Propose Schedule
-//       </button>
-//     );
-//   }
+  if (proposedLessons.length === 0) {
+    return (
+      <div className="flex">
+        <button
+          className="rounded bg-purple-500 p-4"
+          onClick={() => onGenerateScheduleClick()}
+        >
+          Click to Propose Schedule
+        </button>
+      </div>
+    );
+  }
 
-//   return (
-//     <div className="flex w-full justify-center py-4">
-//       <div className="flex flex-col items-center justify-center">
-//         <h1 className="text-2xl">Proposed Lessons</h1>
-//         <table className="border-collapse border border-gray-500">
-//           <thead>
-//             <tr>
-//               <th className="border border-gray-400 p-2">Tutor</th>
-//               <th className="border border-gray-400 p-2">Student</th>
-//               <th className="border border-gray-400 p-2">Start Time</th>
-//               <th className="border border-gray-400 p-2">End Time</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {proposedLessons.map((proposedLesson) => (
-//               <tr key={proposedLesson.id}>
-//                 <td className="border border-gray-400 p-2">
-//                   {proposedLesson.tutorId}
-//                 </td>
-//                 <td className="border border-gray-400 p-2">
-//                   {proposedLesson.studentId}
-//                 </td>
-//                 <td className="border border-gray-400 p-2">
-//                   {proposedLesson.startTime}
-//                 </td>
-//                 <td className="border border-gray-400 p-2">
-//                   {proposedLesson.endTime}
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       </div>
-//     </div>
-//   );
-// };
+  return (
+    <div className="flex w-full justify-center py-4">
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-2xl">Proposed Lessons</h1>
+        <table className="border-collapse border border-gray-500">
+          <thead>
+            <tr>
+              <th className="border border-gray-400 p-2">Tutor Name</th>
+              <th className="border border-gray-400 p-2">Tutor Email</th>
+              <th className="border border-gray-400 p-2">Student Name</th>
+              <th className="border border-gray-400 p-2">Student Email</th>
+              <th className="border border-gray-400 p-2">Start Time</th>
+              <th className="border border-gray-400 p-2">End Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {proposedLessons.map((proposedLesson, index) => (
+              <tr key={`proposed-lesson-row-${index}`}>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.tutorName}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.tutorEmail}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.studentName}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.studentEmail}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.startTime}
+                </td>
+                <td className="border border-gray-400 p-2">
+                  {proposedLesson.endTime}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
 
 export default Home;
