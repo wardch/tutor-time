@@ -47,7 +47,7 @@ export const TutorAvailabilityForm = () => {
     <div className="flex w-full justify-center py-4">
       <div className="flex flex-col items-center justify-center">
         <h1 className="text-2xl">Tutors Availability</h1>
-        <form onSubmit={handleSubmit(submit)} className="p-4">
+        <form onSubmit={handleSubmit(submit)} className="p-4 flex flex-col">
           <input type="text" placeholder="Tutor's name" {...register("name")} />
           <input
             type="email"

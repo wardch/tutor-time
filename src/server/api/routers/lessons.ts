@@ -2,11 +2,9 @@ import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 import { type Context } from "~/server/api/trpc";
 
 
-export type MatchingStudentTutor = {
-  studentId: number;
+export type ProposedLesson = {
   studentName: string;
   studentEmail: string;
-  tutorId: number;
   tutorName: string;
   tutorEmail: string;
   startTime: string;
@@ -14,53 +12,92 @@ export type MatchingStudentTutor = {
   lessonCount: number;
 };
 
-const getStudentsWithMatchingTutors = async (ctx: Context) : Promise<MatchingStudentTutor[]> => {
-const result = await ctx.prisma.$queryRaw<MatchingStudentTutor[]>`SELECT
-        s.id AS studentId,
-        s.name AS studentName,
-        s.email AS studentEmail,
-        t.id AS tutorId,
-        t.name AS tutorName,
-        t.email AS tutorEmail,
-        sa.startTime AS startTime,
-        sa.endTime AS endTime,
-        matched_tutors.lesson_count AS lessonCount
-    FROM
-        Student AS s
-        INNER JOIN StudentAvailability AS sa ON s.id = sa.studentId
-        INNER JOIN (
-            SELECT
-                t2.id AS tutor_id,
-                ta2.startTime AS start_time,
-                ta2.endTime AS end_time,
-                COUNT(l.id) AS lesson_count
-            FROM
-                TutorAvailability AS ta2
-                INNER JOIN Tutor AS t2 ON ta2.tutorId = t2.id
-                LEFT JOIN Lesson AS l ON l.tutorId = t2.id
-            GROUP BY
-                t2.id, ta2.startTime, ta2.endTime
-        ) AS matched_tutors ON sa.startTime <= matched_tutors.end_time
-        AND sa.endTime >= matched_tutors.start_time
-        INNER JOIN Tutor AS t ON t.id = matched_tutors.tutor_id
-    WHERE
-        matched_tutors.tutor_id = (
-            SELECT
-                t3.id
-            FROM
-                TutorAvailability AS ta3
-                INNER JOIN Tutor AS t3 ON ta3.tutorId = t3.id
-                LEFT JOIN Lesson AS l2 ON l2.tutorId = t3.id
-            WHERE
-                sa.startTime <= ta3.endTime
-                AND sa.endTime >= ta3.startTime
-            GROUP BY
-                t3.id
-            ORDER BY
-                COUNT(l2.id), t3.id
-            LIMIT 1
-        );`
-  return result;
+const getStudentsAndAvailabilities = async (ctx: Context) => {
+  return await ctx.prisma.student.findMany({
+    include: {
+      availabilities: true,
+    },
+  });
+}
+
+const getTutorsAndAvailabilities = async (ctx: Context) => {
+  return await ctx.prisma.tutor.findMany({
+    include: {
+      availabilities: true,
+      lessons: true,
+    },
+  });
+}
+
+const timeOverlap = (tutorStartTime: string, tutorEndTime: string, studentStartTime: string, studentEndTime: string) => {
+  return (
+    (tutorStartTime <= studentEndTime && tutorEndTime >= studentStartTime) ||
+    (tutorEndTime >= studentStartTime && tutorEndTime <= studentEndTime)
+  );
+}
+
+type TutorLessonCount = Record<number, number>;
+
+
+
+const getStudentsWithMatchingTutors = async (ctx: Context) : Promise<ProposedLesson[]> => {
+const students = await getStudentsAndAvailabilities(ctx);
+  const tutors = await getTutorsAndAvailabilities(ctx);
+
+  const tutorLessonCount : TutorLessonCount = {};
+  const proposedLessons : ProposedLesson[] = [];
+
+  tutors.forEach((tutor) => {
+    tutorLessonCount[tutor.id] = tutor.lessons.length;
+  });
+
+  students.forEach((student) => {
+    student.availabilities.forEach((availability) => {
+      const matchedTutors = tutors.filter((tutor) =>
+        tutor.availabilities.some(
+          (tutorAvailability) =>
+            timeOverlap(
+              tutorAvailability.startTime,
+              tutorAvailability.endTime,
+              availability.startTime,
+              availability.endTime
+            )
+        )
+      );
+
+      if (matchedTutors.length > 0) {
+        matchedTutors.sort((a, b) => {
+            return tutorLessonCount[a.id] - tutorLessonCount[b.id]
+        });
+
+        const selectedTutor = matchedTutors[0];
+        tutorLessonCount[selectedTutor.id] += 1;
+
+        proposedLessons.push({
+            studentName: student.name,
+            studentEmail: student.email,
+            tutorName: selectedTutor.name,
+            tutorEmail: selectedTutor.email,
+            startTime: availability.startTime,
+            endTime: availability.endTime,
+            lessonCount: 4
+        });
+      }
+    });
+  });  
+
+    proposedLessons.sort((a, b) => {
+    // Sort by tutorName
+    if (a.tutorName < b.tutorName) { return -1; }
+    if (a.tutorName > b.tutorName) { return 1; }
+    // If tutorNames are equal, sort by startTime
+    if (a.startTime < b.startTime) { return -1; }
+    if (a.startTime > b.startTime) { return 1; }
+    // If both tutorName and startTime are equal, leave the order unchanged
+    return 0;
+    });
+  
+  return proposedLessons;
 };
 
 
