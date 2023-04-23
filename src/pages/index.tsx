@@ -43,7 +43,6 @@ const Home: NextPage = () => {
         )}
         {!!user.isSignedIn && (
           <div className="w-full max-w-screen-lg">
-            <LessonSchedule />
             <div className="mt-10">
               <TutorAvailabilityForm />
             </div>
@@ -56,6 +55,7 @@ const Home: NextPage = () => {
             <div className="mt-10">
               <StudentAvailabilityTable />
             </div>
+            <LessonSchedule />
           </div>
         )}
       </main>

@@ -15,6 +15,7 @@ export const TutorAvailabilityForm = () => {
     onSuccess: () => {
       console.log("SUCCESS POSTING");
       void ctx.tutorAvailability.getAll.invalidate();
+      void ctx.lessons.getProposedLessons.invalidate()
     },
     onError: (e) => {
       console.log("ERROR", e);

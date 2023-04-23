@@ -20,9 +20,12 @@ export const LessonSchedule = () => {
   }, [proposedLessonsQuery]);
 
   return (
-    <div>
+    <div className="py-8">
       <div className="overflow-x-auto">
-        <h1 className="py-4 text-2xl text-slate-500">Proposed Lessons</h1>
+        <h1 className="py-4 text-2xl text-slate-500">Proposed Lesson Schedule</h1>
+        <p className="text-slate-500 py-4">Add or remove tutors and students above to dynamically update the schedule. The schedule will evenly distribute students amongst tutors. Tutors are matched with students who have shared availability. 
+           We preferentially assign to tutors who have lower lesson counts, then tutors with higher lesson counts.
+        </p>
         <table className="w-full border-collapse  rounded-lg shadow-lg">
           <thead className="bg-purple-600 text-white">
             <tr>
@@ -62,14 +65,6 @@ export const LessonSchedule = () => {
           </tbody>
         </table>
       </div>
-        <div className="flex py-8">
-          <button
-            className="rounded bg-purple-500 p-4 text-white"
-            onClick={() => onGenerateScheduleClick()}
-          >
-            Regenerate Schedule
-          </button>
-        </div>
     </div>
   );
 };

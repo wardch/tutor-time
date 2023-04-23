@@ -1,8 +1,9 @@
 import { api } from "~/utils/api";
 import { type DeleteStudentAvailabilityProps } from "~/utils/zodHelpers";
+import { LoadingTable } from "../LoadingTable";
 
 export const StudentAvailabilityTable = () => {
-  const { data: studentAvailabilities } = api.studentAvailability.getAll.useQuery();
+  const { data: studentAvailabilities, isLoading: studentsLoading } = api.studentAvailability.getAll.useQuery();
 
   const ctx = api.useContext();
 
@@ -10,6 +11,7 @@ export const StudentAvailabilityTable = () => {
     onSuccess: () => {
       console.log("Delete availability");
       void ctx.studentAvailability.getAll.invalidate();
+      void ctx.lessons.getProposedLessons.invalidate();
     },
     onError: (e) => {
       console.log("ERROR", e);
@@ -20,9 +22,16 @@ export const StudentAvailabilityTable = () => {
     mutate(props);
   };
 
+  if (studentsLoading) return <LoadingTable />;
+  
+
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg">
       <h1 className="py-4 text-2xl text-slate-500">Available Students</h1>
+      <p className="pb-4 text-slate-500">
+        A list of students availabilities. We only allow one student to schedule one block of time. 
+        This is contrast with tutors who are able to have a range of tutoring times.
+      </p>
       <table className="w-full border-collapse">
         <thead className="bg-purple-600 text-white">
           <tr>

@@ -1,5 +1,20 @@
 import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
 import { type Context } from "~/server/api/trpc";
+import { type Tutor as PrismaTutor, type Lesson, type Student as PrismaStudent, type StudentAvailability, type TutorAvailability } from "@prisma/client";
+
+
+type StudentWithLessons = PrismaStudent & {
+  lessons: Lesson[];
+} & {
+  availabilities: StudentAvailability[]
+}
+
+type TutorWithLessons = PrismaTutor & {
+  lessons: Lesson[];
+} & {
+  availabilities: TutorAvailability[]
+}
+
 
 
 export type ProposedLesson = {
@@ -16,6 +31,7 @@ const getStudentsAndAvailabilities = async (ctx: Context) => {
   return await ctx.prisma.student.findMany({
     include: {
       availabilities: true,
+      lessons: true
     },
   });
 }
@@ -31,8 +47,7 @@ const getTutorsAndAvailabilities = async (ctx: Context) => {
 
 const timeOverlap = (tutorStartTime: string, tutorEndTime: string, studentStartTime: string, studentEndTime: string) => {
   return (
-    (tutorStartTime <= studentEndTime && tutorEndTime >= studentStartTime) ||
-    (tutorEndTime >= studentStartTime && tutorEndTime <= studentEndTime)
+    tutorStartTime === studentStartTime && tutorEndTime === studentEndTime
   );
 }
 
@@ -40,10 +55,7 @@ type TutorLessonCount = Record<number, number>;
 
 
 
-const getStudentsWithMatchingTutors = async (ctx: Context) : Promise<ProposedLesson[]> => {
-const students = await getStudentsAndAvailabilities(ctx);
-  const tutors = await getTutorsAndAvailabilities(ctx);
-
+const getStudentsWithMatchingTutors = ({tutors, students} : {tutors: TutorWithLessons[], students: StudentWithLessons[] }) => {
   const tutorLessonCount : TutorLessonCount = {};
   const proposedLessons : ProposedLesson[] = [];
 
@@ -71,13 +83,20 @@ const students = await getStudentsAndAvailabilities(ctx);
         });
 
         const selectedTutor = matchedTutors[0];
+        
         if(!selectedTutor) {
             console.log(`NO TUTOR FOUND FOR STUDENT: ${student.name} EMAIL: ${student.email}`)
             return;
         }
+        selectedTutor.availabilities = selectedTutor.availabilities.filter((tutorAvailability) => {
+            return !timeOverlap(
+                tutorAvailability.startTime,
+                tutorAvailability.endTime,
+                availability.startTime,
+                availability.endTime
+            )
+        })
         tutorLessonCount[selectedTutor.id] += 1;
-
-        console.log('SELECTED TUT', selectedTutor.availabilities)
       
         proposedLessons.push({
             studentName: student.name,
@@ -102,8 +121,6 @@ const students = await getStudentsAndAvailabilities(ctx);
     // If both tutorName and startTime are equal, leave the order unchanged
     return 0;
     });
-  
-    console.log('proposedLessons :>> ', proposedLessons);
     
   return proposedLessons;
 };
@@ -112,7 +129,9 @@ const students = await getStudentsAndAvailabilities(ctx);
 
 export const lessonRouter = createTRPCRouter({ 
   getProposedLessons: privateProcedure.query(async ({ ctx }) => {
-    const result = await getStudentsWithMatchingTutors(ctx);
+    const tutors = await getTutorsAndAvailabilities(ctx);
+    const students = await getStudentsAndAvailabilities(ctx);
+    const result = getStudentsWithMatchingTutors({tutors, students});
     return result;
   })
 });

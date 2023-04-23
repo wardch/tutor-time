@@ -1,8 +1,10 @@
 import { api } from "~/utils/api";
 import { type DeleteTutorAvailabilityProps } from "~/utils/zodHelpers";
+import { LoadingTable } from "../LoadingTable";
 
 export const TutorAvailabilityTable = () => {
-  const { data: tutorAvailabilities } = api.tutorAvailability.getAll.useQuery();
+  const { data: tutorAvailabilities, isLoading: tutorsLoading } =
+    api.tutorAvailability.getAll.useQuery();
 
   const ctx = api.useContext();
 
@@ -10,6 +12,7 @@ export const TutorAvailabilityTable = () => {
     onSuccess: () => {
       console.log("Delete availability");
       void ctx.tutorAvailability.getAll.invalidate();
+      void ctx.lessons.getProposedLessons.invalidate();
     },
     onError: (e) => {
       console.log("ERROR", e);
@@ -20,9 +23,11 @@ export const TutorAvailabilityTable = () => {
     mutate(props);
   };
 
+  if (tutorsLoading) return <LoadingTable />;
+
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg">
-      <h1 className="text-2xl py-4 text-slate-500">Available Tutors</h1>
+      <h1 className="py-4 text-2xl text-slate-500">Available Tutors</h1>
       <table className="w-full border-collapse">
         <thead className="bg-purple-600 text-white">
           <tr>
