@@ -35,40 +35,21 @@ export const tutorAvailabilityRouter = createTRPCRouter({
       }
     });
     
-    const existingAvailability = await ctx.prisma.tutorAvailability.findFirst({
+     const tutorAvailability = await ctx.prisma.tutorAvailability.upsert({
     where: {
-      tutorId: tutor.id,
-      startTime: {
-        lte: input.endTime,
+        tutorId_startTime_endTime: {
+          tutorId: tutor.id,
+          startTime: input.startTime,
+          endTime: input.endTime,
+        }
       },
-      endTime: {
-        gte: input.startTime,
-      },
-    },
-  });
-
-  let tutorAvailability;
-  console.log('existingAvailability :>> ', existingAvailability);
-
-  if (existingAvailability) {
-    tutorAvailability = await ctx.prisma.tutorAvailability.update({
-      where: {
-        id: existingAvailability.id,
-      },
-      data: {
-        startTime: input.startTime < existingAvailability.startTime ? input.startTime : existingAvailability.startTime,
-        endTime: input.endTime > existingAvailability.endTime ? input.endTime : existingAvailability.endTime,
-      },
-    });
-  } else {
-    tutorAvailability = await ctx.prisma.tutorAvailability.create({
-      data: {
-        tutorId: tutor.id,
+      update: {},
+      create: {
         startTime: input.startTime,
         endTime: input.endTime,
-      },
-    });
-  }
+        tutorId: tutor.id
+      }
+    })
 
     return tutorAvailability
   }),

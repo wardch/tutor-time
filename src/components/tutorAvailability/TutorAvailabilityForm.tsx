@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
-import { availabilitySchema, type AvailabilityForm } from "~/utils/zodHelpers";
+import { studentAvailabilitySchema, type AvailabilityForm, StudentAvailabilityFormProps } from "~/utils/zodHelpers";
+import { add30Minutes, generateTimeOptions } from "../helpers/time";
 
 export const TutorAvailabilityForm = () => {
   const { register, handleSubmit } = useForm<AvailabilityForm>({
-    resolver: zodResolver(availabilitySchema),
+    resolver: zodResolver(studentAvailabilitySchema),
   });
 
   const ctx = api.useContext();
@@ -20,25 +21,9 @@ export const TutorAvailabilityForm = () => {
     },
   });
 
-  const submit = (data: AvailabilityForm) => {
-    mutate(data);
-  };
-
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        options.push(
-          <option key={time} value={time}>
-            {time}
-          </option>
-        );
-      }
-    }
-    return options;
+  const submit = (data: StudentAvailabilityFormProps) => {
+    const endTime = add30Minutes(data.startTime);
+    mutate({ ...data, endTime });
   };
 
   /* eslint-disable */
@@ -66,24 +51,13 @@ export const TutorAvailabilityForm = () => {
             {...register("email")}
           />
           <label className="pt-4" htmlFor="startTime">
-            Start Time
+            Start Time for 30 min class
           </label>
           <select
             id="startTime"
             className="bg-slate-200 p-2 text-slate-700"
             defaultValue="08:00"
             {...register("startTime")}
-          >
-            {generateTimeOptions()}
-          </select>
-          <label htmlFor="endTime" className="pt-4">
-            End Time
-          </label>
-          <select
-            id="endTime"
-            className="bg-slate-200 p-2 text-slate-700"
-            defaultValue="10:00"
-            {...register("endTime")}
           >
             {generateTimeOptions()}
           </select>

@@ -103,6 +103,8 @@ const students = await getStudentsAndAvailabilities(ctx);
     return 0;
     });
   
+    console.log('proposedLessons :>> ', proposedLessons);
+    
   return proposedLessons;
 };
 

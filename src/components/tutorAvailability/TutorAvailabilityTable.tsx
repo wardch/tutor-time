@@ -22,6 +22,7 @@ export const TutorAvailabilityTable = () => {
 
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg">
+      <h1 className="text-2xl py-4 text-slate-500">Available Tutors</h1>
       <table className="w-full border-collapse">
         <thead className="bg-purple-600 text-white">
           <tr>

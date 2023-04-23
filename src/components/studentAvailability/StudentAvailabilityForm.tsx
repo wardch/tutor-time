@@ -3,15 +3,13 @@ import { useForm } from "react-hook-form";
 import { api } from "~/utils/api";
 import {
   studentAvailabilitySchema,
+  type AvailabilityForm,
   type StudentAvailabilityFormProps,
 } from "~/utils/zodHelpers";
+import { add30Minutes, generateTimeOptions } from "../helpers/time";
 
 export const StudentAvailabilityForm = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<StudentAvailabilityFormProps>({
+  const { register, handleSubmit } = useForm<AvailabilityForm>({
     resolver: zodResolver(studentAvailabilitySchema),
   });
 
@@ -32,75 +30,48 @@ export const StudentAvailabilityForm = () => {
     mutate({ ...data, endTime });
   };
 
-  const generateTimeOptions = () => {
-    const options = [];
-    for (let hour = 0; hour < 24; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        const time = `${hour.toString().padStart(2, "0")}:${minute
-          .toString()
-          .padStart(2, "0")}`;
-        options.push(
-          <option key={time} value={time}>
-            {time}
-          </option>
-        );
-      }
-    }
-    return options;
-  };
-
-  const add30Minutes = (time: string): string => {
-    const [hoursStr, minutesStr] = time.split(":");
-    if (!hoursStr || !minutesStr) {
-      throw new Error("Invalid time format");
-    }
-    const hours = parseInt(hoursStr, 10);
-    const minutes = parseInt(minutesStr, 10);
-    if (isNaN(hours) || isNaN(minutes)) {
-      throw new Error("Invalid time format");
-    }
-    let newHours = hours;
-    let newMinutes = minutes + 30;
-    if (newMinutes >= 60) {
-      newHours = (newHours + 1) % 24;
-      newMinutes -= 60;
-    }
-    return `${newHours.toString().padStart(2, "0")}:${newMinutes
-      .toString()
-      .padStart(2, "0")}`;
-  };
-
   /* eslint-disable */
 
   return (
     <div className="flex w-full justify-center py-4">
-      <div className="flex flex-col items-center justify-center">
-        <h1 className="text-2xl">Students Availability</h1>
-        <form onSubmit={handleSubmit(submit)} className="p-4">
+      <div className="flex flex-col items-center justify-center gap-5">
+        <p className="text-2xl font-light text-slate-500">
+          Please enter student availability below
+        </p>
+        <form
+          onSubmit={handleSubmit(submit)}
+          className="flex w-96 flex-col rounded bg-white p-4"
+        >
+          <label className="">Name</label>
           <input
+            className="bg-slate-200 p-2"
             type="text"
-            placeholder="Student's name"
             {...register("name")}
           />
-          {errors.name && <span>{errors.name.message}</span>}
+          <label className="pt-4">Email</label>
           <input
             type="email"
-            placeholder="Student Email"
+            className="bg-slate-200 p-2"
             {...register("email")}
           />
-          {errors.email && <span>{errors.email.message}</span>}
-          <label className="text-slate-400" htmlFor="startTime">
-            Choose Start Time:
+          <label className="pt-4" htmlFor="startTime">
+            Start Time for 30 min class
           </label>
-          {errors.startTime && <span>{errors.startTime.message}</span>}
           <select
             id="startTime"
+            className="bg-slate-200 p-2 text-slate-700"
             defaultValue="08:00"
             {...register("startTime")}
           >
             {generateTimeOptions()}
           </select>
-          <input type="submit" value="Add Availability" />
+          <div className="pt-4">
+            <input
+              className="w-full rounded bg-slate-500 p-2 text-white"
+              type="submit"
+              value="Add Availability"
+            />
+          </div>
         </form>
       </div>
     </div>

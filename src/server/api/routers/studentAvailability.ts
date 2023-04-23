@@ -34,39 +34,17 @@ export const studentAvalabiltyRouter = createTRPCRouter({
       }
     });
     
-    const existingAvailability = await ctx.prisma.studentAvailability.findFirst({
+    const studentAvailability = await ctx.prisma.studentAvailability.upsert({
     where: {
-      studentId: student.id,
-      startTime: {
-        lte: input.endTime,
+      studentId: student.id
       },
-      endTime: {
-        gte: input.startTime,
-      },
-    },
-  });
-
-  let studentAvailability;
-
-  if (existingAvailability) {
-    studentAvailability = await ctx.prisma.studentAvailability.update({
-      where: {
-        id: existingAvailability.id,
-      },
-      data: {
-        startTime: input.startTime < existingAvailability.startTime ? input.startTime : existingAvailability.startTime,
-        endTime: input.endTime > existingAvailability.endTime ? input.endTime : existingAvailability.endTime,
-      },
-    });
-  } else {
-    studentAvailability = await ctx.prisma.studentAvailability.create({
-      data: {
-        studentId: student.id,
+      update: {},
+      create: {
         startTime: input.startTime,
         endTime: input.endTime,
-      },
-    });
-  }
+        studentId: student.id
+      }
+    })
 
     return studentAvailability
   }),

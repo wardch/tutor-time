@@ -32,6 +32,7 @@ model TutorAvailability {
     tutor     Tutor    @relation(fields: [tutorId], references: [id])
 
     @@index([tutorId])
+    @@unique([tutorId, startTime, endTime])
 }
 
 model StudentAvailability {
