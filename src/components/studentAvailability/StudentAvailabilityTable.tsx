@@ -28,7 +28,7 @@ export const StudentAvailabilityTable = () => {
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg">
       <h1 className="py-4 text-2xl text-slate-500">
-        Step 4: View all students' availability
+        Step 4: View availability for all students
       </h1>
       <p className="pb-4 text-slate-500">
         A list of students availabilities. We only allow one student to schedule
