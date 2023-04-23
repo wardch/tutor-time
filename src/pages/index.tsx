@@ -66,11 +66,11 @@ const Home: NextPage = () => {
               </p>
               <p className="pt-4 text-lg">STEP 4</p>
               <p className="text-slate-500">
-                View all tutors&apos;s availability
+                View all student&apos;s availability
               </p>
               <p className="pt-4 text-lg">STEP 5</p>
               <p className="text-slate-500">
-                View the schedule which matches availalbe students with tutors.
+                View the schedule which matches available students with tutors.
               </p>
             </div>
             <div className="mt-20">

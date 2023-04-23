@@ -10,3 +10,6 @@ Tutor Time is a scheduling application built with Next.js that connects tutors a
 - Planetscale (Database)
 - Clerk.js (Authentication)
 - Vercel (Deployment)
+
+
+You can see the app deployed here: https://tutor-time-beryl.vercel.app/
