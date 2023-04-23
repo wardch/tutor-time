@@ -55,7 +55,7 @@ export const LessonSchedule = () => {
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-200 bg-white">
             {proposedLessons?.map((proposedLesson, index) => (
               <tr key={`proposed-lesson-${index}`}>
                 <td className="whitespace-nowrap px-4 py-4">

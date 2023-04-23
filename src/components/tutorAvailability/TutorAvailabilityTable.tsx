@@ -50,7 +50,7 @@ export const TutorAvailabilityTable = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-200 bg-white">
           {tutorAvailabilities?.map((tutor) =>
             tutor.availabilities.map((availability) => (
               <tr key={availability.id}>
