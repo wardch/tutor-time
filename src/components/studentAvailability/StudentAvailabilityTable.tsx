@@ -3,7 +3,8 @@ import { type DeleteStudentAvailabilityProps } from "~/utils/zodHelpers";
 import { LoadingTable } from "../LoadingTable";
 
 export const StudentAvailabilityTable = () => {
-  const { data: studentAvailabilities, isLoading: studentsLoading } = api.studentAvailability.getAll.useQuery();
+  const { data: studentAvailabilities, isLoading: studentsLoading } =
+    api.studentAvailability.getAll.useQuery();
 
   const ctx = api.useContext();
 
@@ -23,17 +24,19 @@ export const StudentAvailabilityTable = () => {
   };
 
   if (studentsLoading) return <LoadingTable />;
-  
 
   return (
     <div className="overflow-x-auto rounded-lg shadow-lg">
-      <h1 className="py-4 text-2xl text-slate-500">Available Students</h1>
+      <h1 className="py-4 text-2xl text-slate-500">
+        Step 4: View all students' availability
+      </h1>
       <p className="pb-4 text-slate-500">
-        A list of students availabilities. We only allow one student to schedule one block of time. 
-        This is contrast with tutors who are able to have a range of tutoring times.
+        A list of students availabilities. We only allow one student to schedule
+        one block of time. This is contrast with tutors who are able to have a
+        range of tutoring times.
       </p>
       <table className="w-full border-collapse">
-        <thead className="bg-purple-600 text-white">
+        <thead className="bg-purple-500 text-white">
           <tr>
             <th scope="col" className="px-4 py-2">
               Name

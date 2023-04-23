@@ -22,12 +22,18 @@ export const LessonSchedule = () => {
   return (
     <div className="py-8">
       <div className="overflow-x-auto">
-        <h1 className="py-4 text-2xl text-slate-500">Proposed Lesson Schedule</h1>
-        <p className="text-slate-500 py-4">Add or remove tutors and students above to dynamically update the schedule. The schedule will evenly distribute students amongst tutors. Tutors are matched with students who have shared availability. 
-           We preferentially assign to tutors who have lower lesson counts, then tutors with higher lesson counts.
+        <h1 className="py-4 text-2xl text-slate-500">
+          Step 5: View the proposed lesson schedule
+        </h1>
+        <p className="py-4 text-slate-500">
+          Add or remove tutors and students above to dynamically update the
+          schedule. The schedule will evenly distribute students amongst tutors.
+          Tutors are matched with students who have shared availability. We
+          preferentially assign to tutors who have lower lesson counts, then
+          tutors with higher lesson counts.
         </p>
         <table className="w-full border-collapse  rounded-lg shadow-lg">
-          <thead className="bg-purple-600 text-white">
+          <thead className="bg-purple-500 text-white">
             <tr>
               <th scope="col" className="px-4 py-2">
                 Tutor Name

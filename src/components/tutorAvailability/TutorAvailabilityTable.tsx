@@ -26,10 +26,12 @@ export const TutorAvailabilityTable = () => {
   if (tutorsLoading) return <LoadingTable />;
 
   return (
-    <div className="overflow-x-auto rounded-lg shadow-lg">
-      <h1 className="py-4 text-2xl text-slate-500">Available Tutors</h1>
-      <table className="w-full border-collapse">
-        <thead className="bg-purple-600 text-white">
+    <div className="overflow-x-auto">
+      <h1 className="py-4 text-2xl text-slate-500">
+        Step 2: View all tutors' availability
+      </h1>
+      <table className="w-full border-collapse rounded-lg shadow-lg">
+        <thead className="bg-purple-500 text-white">
           <tr>
             <th scope="col" className="px-4 py-2">
               Name

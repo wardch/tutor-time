@@ -21,7 +21,7 @@ const Home: NextPage = () => {
         <nav className="w-full p-4">
           <div className="flex justify-end">
             {!!user.isSignedIn && (
-              <div className="rounded bg-purple-600 p-4 text-white">
+              <div className="rounded bg-purple-500 p-4 text-white">
                 <SignOutButton />
               </div>
             )}
@@ -36,13 +36,39 @@ const Home: NextPage = () => {
               A scheduling app for tutors and students to help find shared
               availability
             </p>
-            <div className="rounded-lg bg-purple-600 p-4 px-8 py-4 text-lg font-medium text-white shadow-lg hover:bg-purple-700">
+            <div className="rounded-lg bg-purple-500 p-4 px-8 py-4 text-lg font-medium text-white shadow-lg hover:bg-purple-700">
               <SignInButton />
             </div>
           </div>
         )}
         {!!user.isSignedIn && (
           <div className="w-full max-w-screen-lg">
+            <div className="mt-10">
+              <p className="text-3xl">
+                Welcome to Tutor Time the scheduling app.
+              </p>
+              <p className="text-slate-500">
+                Here you can create a schedule for students and tutors based on
+                their shared availability in 5 easy steps:{" "}
+              </p>
+              <p className="pt-4 text-lg">STEP 1</p>
+              <p className="text-slate-500">
+                Enter the tutor's availability for a lesson. All lessons are 30
+                minutes long.
+              </p>
+              <p className="pt-4 text-lg">STEP 2</p>
+              <p className="text-slate-500">View all tutors's availability</p>
+              <p className="pt-4 text-lg">STEP 3</p>
+              <p className="text-slate-500">
+                Enter the student's availability for a lesson
+              </p>
+              <p className="pt-4 text-lg">STEP 4</p>
+              <p className="text-slate-500">View all tutors's availability</p>
+              <p className="pt-4 text-lg">STEP 5</p>
+              <p className="text-slate-500">
+                View the schedule which matches availalbe students with tutors.
+              </p>
+            </div>
             <div className="mt-10">
               <TutorAvailabilityForm />
             </div>

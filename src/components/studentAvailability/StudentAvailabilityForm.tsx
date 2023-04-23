@@ -7,6 +7,7 @@ import {
   type StudentAvailabilityFormProps,
 } from "~/utils/zodHelpers";
 import { add30Minutes, generateTimeOptions } from "../helpers/time";
+import { LoadingSpinner } from "../loadingSpinner";
 
 export const StudentAvailabilityForm = () => {
   const { register, handleSubmit } = useForm<AvailabilityForm>({
@@ -15,16 +16,17 @@ export const StudentAvailabilityForm = () => {
 
   const ctx = api.useContext();
 
-  const { mutate } = api.studentAvailability.create.useMutation({
-    onSuccess: () => {
-      console.log("SUCCESS POSTING");
-      void ctx.studentAvailability.getAll.invalidate();
-      void ctx.lessons.getProposedLessons.invalidate();
-    },
-    onError: (e) => {
-      console.log("ERROR", e);
-    },
-  });
+  const { mutate, isLoading: isAddingAvailability } =
+    api.studentAvailability.create.useMutation({
+      onSuccess: () => {
+        console.log("SUCCESS POSTING");
+        void ctx.studentAvailability.getAll.invalidate();
+        void ctx.lessons.getProposedLessons.invalidate();
+      },
+      onError: (e) => {
+        console.log("ERROR", e);
+      },
+    });
 
   const submit = (data: StudentAvailabilityFormProps) => {
     const endTime = add30Minutes(data.startTime);
@@ -37,7 +39,7 @@ export const StudentAvailabilityForm = () => {
     <div className="flex w-full justify-center py-4">
       <div className="flex flex-col items-center justify-center gap-5">
         <p className="text-2xl font-light text-slate-500">
-          Please enter student availability below
+          Step 3: Enter a student's availability
         </p>
         <form
           onSubmit={handleSubmit(submit)}
@@ -67,11 +69,14 @@ export const StudentAvailabilityForm = () => {
             {generateTimeOptions()}
           </select>
           <div className="pt-4">
-            <input
-              className="w-full rounded bg-slate-500 p-2 text-white"
-              type="submit"
-              value="Add Availability"
-            />
+            {isAddingAvailability && <LoadingSpinner />}
+            {!isAddingAvailability && (
+              <input
+                className="w-full rounded bg-purple-500 p-2 text-white"
+                type="submit"
+                value="Add Availability"
+              />
+            )}
           </div>
         </form>
       </div>
